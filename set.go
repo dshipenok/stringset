@@ -21,6 +21,12 @@ func (s *StringSet) Add(values ...string) {
 	}
 }
 
+func (s *StringSet) Remove(values ...string) {
+	for _, value := range values {
+		delete(s.m, value)
+	}
+}
+
 func (s *StringSet) Merge(toMerge *StringSet) {
 	for val := range toMerge.m {
 		s.m[val] = struct{}{}
@@ -38,6 +44,10 @@ func (s *StringSet) Has(values ...string) bool {
 
 func (s *StringSet) Count() int {
 	return len(s.m)
+}
+
+func (s *StringSet) Empty() bool {
+	return len(s.m) == 0
 }
 
 func (s *StringSet) Slice() []string {
