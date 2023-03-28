@@ -39,17 +39,23 @@ func (s *StringSet) Remove(values ...string) {
 }
 
 func (s *StringSet) Merge(toMerge *StringSet) {
-	for val := range toMerge.m {
+	for val := range toMerge.Set() {
 		s.m[val] = struct{}{}
 	}
 }
 
 func (s *StringSet) Has(value string) bool {
+	if s == nil {
+		return false
+	}
 	_, has := s.m[value]
 	return has
 }
 
 func (s *StringSet) HasAnyFrom(o *StringSet) bool {
+	if s == nil {
+		return false
+	}
 	for value := range o.m {
 		_, has := s.m[value]
 		if has {
@@ -60,6 +66,9 @@ func (s *StringSet) HasAnyFrom(o *StringSet) bool {
 }
 
 func (s *StringSet) Equals(set *StringSet) bool {
+	if s == nil || set == nil {
+		return s == set
+	}
 	if len(s.m) != len(set.m) {
 		return false // fast-path
 	}
@@ -111,14 +120,20 @@ func (s *StringSet) Subtract(sub *StringSet) *StringSet {
 }
 
 func (s *StringSet) Count() int {
+	if s == nil {
+		return 0
+	}
 	return len(s.m)
 }
 
 func (s *StringSet) Empty() bool {
-	return len(s.m) == 0
+	return s == nil || len(s.m) == 0
 }
 
 func (s *StringSet) Slice() []string {
+	if s == nil {
+		return nil
+	}
 	slice := make([]string, 0, len(s.m))
 	for val := range s.m {
 		slice = append(slice, val)
@@ -133,10 +148,16 @@ func (s *StringSet) SortedSlice() []string {
 }
 
 func (s *StringSet) Set() map[string]struct{} {
+	if s == nil {
+		return nil
+	}
 	return s.m
 }
 
 func (s *StringSet) Clone() *StringSet {
+	if s == nil {
+		return nil
+	}
 	m := make(map[string]struct{}, len(s.m))
 	for val := range s.m {
 		m[val] = struct{}{}
@@ -145,6 +166,9 @@ func (s *StringSet) Clone() *StringSet {
 }
 
 func (s *StringSet) ForEach(f func(string)) {
+	if s == nil {
+		return
+	}
 	for val := range s.m {
 		f(val)
 	}
