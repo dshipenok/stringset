@@ -59,8 +59,8 @@ func Test_StringSet_Add(t *testing.T) {
 
 func Test_StringSet_Subtract(t *testing.T) {
 	tests := []struct {
-		a        *StringSet
-		b        *StringSet
+		a        *Set[string]
+		b        *Set[string]
 		expected []string
 	}{
 		{
@@ -96,8 +96,8 @@ func Test_StringSet_Subtract(t *testing.T) {
 
 func Test_StringSet_Intersection(t *testing.T) {
 	tests := []struct {
-		a        *StringSet
-		b        *StringSet
+		a        *Set[string]
+		b        *Set[string]
 		expected []string
 	}{
 		{
@@ -148,7 +148,7 @@ func Test_StringSet_Intersection(t *testing.T) {
 
 func Test_StringSet_Remove(t *testing.T) {
 	tests := []struct {
-		a        *StringSet
+		a        *Set[string]
 		value    string
 		expected []string
 	}{
@@ -191,7 +191,7 @@ func Test_StringSet_Remove(t *testing.T) {
 
 func Test_StringSet_Empty(t *testing.T) {
 	tests := []struct {
-		a        *StringSet
+		a        *Set[string]
 		expected bool
 	}{
 		{
@@ -215,8 +215,8 @@ func Test_StringSet_Empty(t *testing.T) {
 
 func Test_StringSet_Equals(t *testing.T) {
 	tests := []struct {
-		a        *StringSet
-		b        *StringSet
+		a        *Set[string]
+		b        *Set[string]
 		expected bool
 	}{
 		{
@@ -262,8 +262,8 @@ func Test_StringSet_Equals(t *testing.T) {
 
 func Test_StringSet_HasAnyFrom(t *testing.T) {
 	tests := []struct {
-		a        *StringSet
-		b        *StringSet
+		a        *Set[string]
+		b        *Set[string]
 		expected bool
 	}{
 		{

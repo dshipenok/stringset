@@ -1,24 +1,38 @@
 package set
 
-import "sort"
+import (
+	"sort"
+)
 
-type StringSet struct {
-	m map[string]struct{}
+type ordered interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+		~float32 | ~float64 |
+		~string
 }
 
-// NewStringSet constructor
-func NewStringSet(values ...string) *StringSet {
-	m := make(map[string]struct{}, len(values))
+type Set[T ordered] struct {
+	m map[T]struct{}
+}
+
+// NewSet constructor
+func NewSet[T ordered](values ...T) *Set[T] {
+	m := make(map[T]struct{}, len(values))
 	for _, val := range values {
 		m[val] = struct{}{}
 	}
-	return &StringSet{
+	return &Set[T]{
 		m: m,
 	}
 }
 
+// NewStringSet constructor
+func NewStringSet(values ...string) *Set[string] {
+	return NewSet(values...)
+}
+
 // NewStringSuperSet groups content of several StringSet's
-func NewStringSuperSet(sets ...*StringSet) *StringSet {
+func NewStringSuperSet(sets ...*Set[string]) *Set[string] {
 	set := NewStringSet()
 	for _, s := range sets {
 		set.Merge(s)
@@ -26,25 +40,25 @@ func NewStringSuperSet(sets ...*StringSet) *StringSet {
 	return set
 }
 
-func (s *StringSet) Add(values ...string) {
+func (s *Set[T]) Add(values ...T) {
 	for _, value := range values {
 		s.m[value] = struct{}{}
 	}
 }
 
-func (s *StringSet) Remove(values ...string) {
+func (s *Set[T]) Remove(values ...T) {
 	for _, value := range values {
 		delete(s.m, value)
 	}
 }
 
-func (s *StringSet) Merge(toMerge *StringSet) {
+func (s *Set[T]) Merge(toMerge *Set[T]) {
 	for val := range toMerge.Set() {
 		s.m[val] = struct{}{}
 	}
 }
 
-func (s *StringSet) Has(value string) bool {
+func (s *Set[T]) Has(value T) bool {
 	if s == nil {
 		return false
 	}
@@ -52,7 +66,7 @@ func (s *StringSet) Has(value string) bool {
 	return has
 }
 
-func (s *StringSet) HasAnyFrom(o *StringSet) bool {
+func (s *Set[T]) HasAnyFrom(o *Set[T]) bool {
 	if s == nil {
 		return false
 	}
@@ -65,7 +79,7 @@ func (s *StringSet) HasAnyFrom(o *StringSet) bool {
 	return false
 }
 
-func (s *StringSet) Equals(set *StringSet) bool {
+func (s *Set[T]) Equals(set *Set[T]) bool {
 	if s == nil || set == nil {
 		return s == set
 	}
@@ -81,16 +95,16 @@ func (s *StringSet) Equals(set *StringSet) bool {
 	return true
 }
 
-func (s *StringSet) Intersection(set *StringSet) *StringSet {
+func (s *Set[T]) Intersection(set *Set[T]) *Set[T] {
 	a, b := s, set
 	if a.Count() == 0 || b.Count() == 0 {
-		return NewStringSet()
+		return NewSet[T]()
 	}
 	if a.Count() > b.Count() {
 		b, a = a, b
 	}
 
-	result := NewStringSet()
+	result := NewSet[T]()
 	// check each key:
 	for key := range a.m {
 		if b.Has(key) {
@@ -100,15 +114,15 @@ func (s *StringSet) Intersection(set *StringSet) *StringSet {
 	return result
 }
 
-func (s *StringSet) Subtract(sub *StringSet) *StringSet {
+func (s *Set[T]) Subtract(sub *Set[T]) *Set[T] {
 	if s.Count() == 0 {
-		return NewStringSet()
+		return NewSet[T]()
 	}
 	if sub.Count() == 0 {
 		return s.Clone()
 	}
 
-	result := NewStringSet()
+	result := NewSet[T]()
 	// check each key:
 	for key := range s.m {
 		if sub.Has(key) {
@@ -119,53 +133,55 @@ func (s *StringSet) Subtract(sub *StringSet) *StringSet {
 	return result
 }
 
-func (s *StringSet) Count() int {
+func (s *Set[T]) Count() int {
 	if s == nil {
 		return 0
 	}
 	return len(s.m)
 }
 
-func (s *StringSet) Empty() bool {
+func (s *Set[T]) Empty() bool {
 	return s == nil || len(s.m) == 0
 }
 
-func (s *StringSet) Slice() []string {
+func (s *Set[T]) Slice() []T {
 	if s == nil {
 		return nil
 	}
-	slice := make([]string, 0, len(s.m))
+	slice := make([]T, 0, len(s.m))
 	for val := range s.m {
 		slice = append(slice, val)
 	}
 	return slice
 }
 
-func (s *StringSet) SortedSlice() []string {
+func (s *Set[T]) SortedSlice() []T {
 	slice := s.Slice()
-	sort.Strings(slice)
+	sort.Slice(slice, func(i, j int) bool {
+		return slice[i] < slice[j]
+	})
 	return slice
 }
 
-func (s *StringSet) Set() map[string]struct{} {
+func (s *Set[T]) Set() map[T]struct{} {
 	if s == nil {
 		return nil
 	}
 	return s.m
 }
 
-func (s *StringSet) Clone() *StringSet {
+func (s *Set[T]) Clone() *Set[T] {
 	if s == nil {
 		return nil
 	}
-	m := make(map[string]struct{}, len(s.m))
+	m := make(map[T]struct{}, len(s.m))
 	for val := range s.m {
 		m[val] = struct{}{}
 	}
-	return &StringSet{m: m}
+	return &Set[T]{m: m}
 }
 
-func (s *StringSet) ForEach(f func(string)) {
+func (s *Set[T]) ForEach(f func(T)) {
 	if s == nil {
 		return
 	}
