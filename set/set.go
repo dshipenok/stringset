@@ -15,6 +15,8 @@ type Set[T ordered] struct {
 	m map[T]struct{}
 }
 
+type StringSet = Set[string]
+
 // NewSet constructor
 func NewSet[T ordered](values ...T) *Set[T] {
 	m := make(map[T]struct{}, len(values))
@@ -27,7 +29,7 @@ func NewSet[T ordered](values ...T) *Set[T] {
 }
 
 // NewStringSet constructor
-func NewStringSet(values ...string) *Set[string] {
+func NewStringSet(values ...string) *StringSet {
 	return NewSet(values...)
 }
 

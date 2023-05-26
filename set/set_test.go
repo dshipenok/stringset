@@ -59,8 +59,8 @@ func Test_StringSet_Add(t *testing.T) {
 
 func Test_StringSet_Subtract(t *testing.T) {
 	tests := []struct {
-		a        *Set[string]
-		b        *Set[string]
+		a        *StringSet
+		b        *StringSet
 		expected []string
 	}{
 		{
